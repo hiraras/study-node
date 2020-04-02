@@ -10,14 +10,14 @@ const serverHandle = (req, res) => {
   req.query = querystring.parse(url.split('?')[1]);
   res.setHeader('Content-type', 'application/json');
   if (method === METHODS.POST) {
-    getPostData(req).then(postData => {
+    getPostBody(req).then(postData => {
       req.body = postData;
       getResponse(req, res);
     });
   }
 }
 
-const getPostData = (req) => {
+const getPostBody = (req) => {
   return new Promise((resolve) => {
     if (req.headers['content-type'] === 'application/json') {
       let postData = '';
