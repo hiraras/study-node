@@ -1,35 +1,30 @@
-const http = require('http');
+
 const querystring = require('querystring');
-const CONSTANT = require('./config/constant');
+const { handleBlogRouter } = require('./src/router/blog');
+const { handleUserRouter } = require('./src/router/user');
 
-const server = http.createServer((req, res) => {
-  const { url, method } = req;
-  const path = querystring.parse(url.split('?')[0]);
-  const query = querystring.parse(url.split('?')[1]);
-
-  const resData = {
-    url, method, path, query
-  }
-  
+const serverHandle = (req, res) => {
+  const { url } = req;
+  req.path = url.split('?')[0];
+  req.query = querystring.parse(url.split('?')[1]);
   res.setHeader('Content-type', 'application/json');
-  if (method === CONSTANT.METHODS.GET) {
-    res.end(JSON.stringify(resData));
-  } else if (method === CONSTANT.METHODS.POST) {
-    let postData = '';
-    req.on('data', thunk => {
-      postData += thunk.toString();
-    });
-    req.on('end', () => {
-      res.end(JSON.stringify({
-        ...resData,
-        postData: JSON.stringify(postData)
-      }));
-    });
+
+  const blogResData = handleBlogRouter(req, res);
+  if (blogResData) {
+    res.end(JSON.stringify(blogResData));
+    return ;
   }
 
+  const userResData = handleUserRouter(req, res);
+  if (userResData) {
+    res.end(JSON.stringify(userResData));
+    return ;
+  }
 
-});
+  // 未命中路由
+  res.writeHead(404, { 'Content-type': 'text/plain' });
+  res.write('404 Not Found\n');
+  res.end();
+}
 
-server.listen(3000, () => {
-  console.log('listening on 3000 port');
-});
+module.exports = serverHandle;
