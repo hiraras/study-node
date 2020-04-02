@@ -1,6 +1,6 @@
 
 const CONSTANT = require('../../config/constant');
-const { getList } = require('../controller/blog');
+const { getList, getDetail } = require('../controller/blog');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
 
 const handleBlogRouter = (req, res) => {
@@ -16,16 +16,14 @@ const handleBlogRouter = (req, res) => {
 
   // 获取博客详情
   if (method === CONSTANT.METHODS.GET && path === '/api/blog/detail') {
-    return {
-      msg: '这是获取博客详情的接口'
-    }
+    const { id = '' } = req.query;
+    const resData = getDetail(id);
+    return new SuccessModel(resData, 'success');
   }
 
   // 新建一篇博客
   if (method === CONSTANT.METHODS.POST && path === '/api/blog/new') {
-    return {
-      msg: '这是新建博客的接口'
-    }
+    return new SuccessModel(null, 'success');
   }
 
   // 更新一篇博客
