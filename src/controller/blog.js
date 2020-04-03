@@ -42,9 +42,23 @@ const updateBlog = id => {
   }
 }
 
+const deleteBlog = id => {
+  if (!id) {
+    throw new Error('lose id');
+  }
+  return {
+    id,
+    title: '标题' + id,
+    content: '内容' + id,
+    createTime: Date.now(),
+    author: '张三',
+  }
+}
+
 module.exports = {
   getList,
   getDetail,
   newBlog,
-  updateBlog
+  updateBlog,
+  deleteBlog
 }

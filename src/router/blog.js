@@ -1,11 +1,12 @@
 
 const CONSTANT = require('../../config/constant');
-const { getList, getDetail, newBlog, updateBlog } = require('../controller/blog');
+const { getList, getDetail, newBlog, updateBlog, deleteBlog } = require('../controller/blog');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
 
 const handleBlogRouter = (req, res) => {
   const { method, url } = req;
   const path = req.path;
+  const delRequestReg = /(?<=del\/)\d$/g;
 
   // 获取博客列表
   if (method === CONSTANT.METHODS.GET && path === '/api/blog/list') {
@@ -30,7 +31,7 @@ const handleBlogRouter = (req, res) => {
   if (method === CONSTANT.METHODS.POST && path === '/api/blog/update') {
     const { id } = req.body;
     try {
-      const resData =  updateBlog(id);
+      const resData = updateBlog(id);
       return new SuccessModel(resData, 'success');
     } catch (err) {
       return new ErrorModel(null, `fail ${err.message}`);
@@ -38,9 +39,14 @@ const handleBlogRouter = (req, res) => {
   }
 
   // 删除一篇博客
-  if (method === CONSTANT.METHODS.DELETE && path === '/api/blog/del') {
-    return {
-      msg: '这是删除博客的接口'
+  if (method === CONSTANT.METHODS.DELETE && path.includes('/api/blog/del')) {
+    const matchRes = path.match(delRequestReg);
+    const id = matchRes && matchRes[0];
+    try {
+      const resData = deleteBlog(id);
+      return new SuccessModel(resData, 'success');
+    } catch (err) {
+      return new ErrorModel(null, `fall ${err.message}`);
     }
   }
 }

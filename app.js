@@ -8,7 +8,6 @@ const serverHandle = (req, res) => {
   const { url, method } = req;
   req.path = url.split('?')[0];
   req.query = querystring.parse(url.split('?')[1]);
-  res.setHeader('Content-type', 'application/json');
   if (method === METHODS.POST) {
     getPostBody(req).then(postData => {
       req.body = postData;
@@ -38,6 +37,7 @@ const getPostBody = (req) => {
 
 function getResponse(req, res) {
   const blogResData = handleBlogRouter(req, res);
+  res.setHeader('Content-type', 'application/json');
   if (blogResData) {
     res.end(JSON.stringify(blogResData));
     return ;
