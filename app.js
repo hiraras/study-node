@@ -14,6 +14,8 @@ const serverHandle = (req, res) => {
       req.body = postData;
       getResponse(req, res);
     });
+  } else {
+    getResponse(req, res);
   }
 }
 
