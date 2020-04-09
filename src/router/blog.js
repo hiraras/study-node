@@ -17,14 +17,12 @@ const handleBlogRouter = (req, res) => {
 
   // 获取博客详情
   if (method === CONSTANT.METHODS.GET && path === '/api/blog/detail') {
-    const resData = getDetail(id);
-    return new SuccessModel(resData, 'success');
+    return responseWrapper(getDetail(req.query.id));
   }
 
   // 新建一篇博客
   if (method === CONSTANT.METHODS.POST && path === '/api/blog/new') {
-    const resData = newBlog(req.body);
-    return new SuccessModel(resData, 'success');
+    return responseWrapper(newBlog(req.body));
   }
 
   // 更新一篇博客

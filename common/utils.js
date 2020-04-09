@@ -6,7 +6,7 @@ function add(a, b) {
 
 const responseWrapper = promise => {
   return promise.then(data => {
-    return new SuccessModel(data);
+    return new SuccessModel(data, 'success');
   }).catch(err => {
     return new ErrorModel(null, `fail ${err.message}`);
   });

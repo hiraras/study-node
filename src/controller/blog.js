@@ -1,7 +1,6 @@
 
 const { exec } = require('../db/mysql');
 
-
 const getList = (author, keyword) => {
   // 1=1 适配后续内容
   let sql = `select * from blogs where 1=1 `;
@@ -16,20 +15,26 @@ const getList = (author, keyword) => {
 }
 
 const getDetail = (id) => {
-  return {
-    id,
-    title: '标题' + id,
-    content: '内容' + id,
-    createTime: Date.now(),
-    author: '张三',
-  }
+  const  sql = `select * from blogs where id=${id}`;
+  return exec(sql);
 }
 
 const newBlog = (data = {}) => {
-  return {
-    ...data,
-    id: 3
-  }
+  let sql = `
+    insert into blogs (title, content, createtime, author)
+    values ('${data.title}', '${data.content}', ${Date.now()}, '${data.author}');
+  `;
+  return exec(sql).then(insertData => {
+    if (insertData.affectedRows === 1) {
+      return Promise.resolve({
+        id: insertData.insertId
+      });
+    } else {
+      return Promise.reject('fail to add new blog');
+    }
+  }).catch(err => {
+    return Promise.reject(err);
+  });
 }
 
 const updateBlog = id => {
