@@ -39,14 +39,14 @@ function getResponse(req, res) {
   const blogResData = handleBlogRouter(req, res);
   res.setHeader('Content-type', 'application/json');
   if (blogResData) {
-    res.end(JSON.stringify(blogResData));
-    return ;
+    return blogResData.then(data => {
+      res.end(JSON.stringify(data));
+    });
   }
-
-  const userResData = handleUserRouter(req, res);
   if (userResData) {
-    res.end(JSON.stringify(userResData));
-    return ;
+    return userResData.then(data => {
+      res.end(JSON.stringify(data));
+    });
   }
 
   // 未命中路由
@@ -54,5 +54,6 @@ function getResponse(req, res) {
   res.write('404 Not Found\n');
   res.end();
 }
+
 
 module.exports = serverHandle;

@@ -2,6 +2,7 @@
 const CONSTANT = require('../../config/constant');
 const { getList, getDetail, newBlog, updateBlog, deleteBlog } = require('../controller/blog');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
+const { responseWrapper } = require('../../common/utils');
 
 const handleBlogRouter = (req, res) => {
   const { method, url } = req;
@@ -11,8 +12,7 @@ const handleBlogRouter = (req, res) => {
   // 获取博客列表
   if (method === CONSTANT.METHODS.GET && path === '/api/blog/list') {
     const { author = '', keyword = '' } = req.query;
-    const resData = getList(author, keyword);
-    return new SuccessModel(resData);
+    return responseWrapper(getList(author, keyword));
   }
 
   // 获取博客详情

@@ -1,15 +1,18 @@
 
+const { exec } = require('../db/mysql');
+
+
 const getList = (author, keyword) => {
-  return new Array(10).fill(0).map((elem, index) => {
-    return {
-      id: index + 1,
-      title: '标题' + index,
-      content: '内容' + index,
-      createTime: Date.now(),
-      author,
-      keyword
-    }
-  })
+  // 1=1 适配后续内容
+  let sql = `select * from blogs where 1=1 `;
+  if (author) {
+    sql += `and author='${author}' `;
+  }
+  if (keyword) {
+    sql += `and title like '%${keyword}%' `;
+  }
+  sql += `order by createtime desc;`;
+  return exec(sql);
 }
 
 const getDetail = (id) => {
