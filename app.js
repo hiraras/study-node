@@ -6,6 +6,9 @@ const { METHODS } = require('./config/constant');
 
 const serverHandle = (req, res) => {
   const { url, method } = req;
+  // 允许跨域
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   req.path = url.split('?')[0];
   req.query = querystring.parse(url.split('?')[1]);
   if (method === METHODS.POST) {
@@ -13,6 +16,10 @@ const serverHandle = (req, res) => {
       req.body = postData;
       getResponse(req, res);
     });
+  } else if(method === METHODS.OPTIONS) {
+    res.writeHead(200, { 'Content-type': 'text/plain' });
+    res.write('404 Not Found\n');
+    res.end();
   } else {
     getResponse(req, res);
   }
@@ -43,6 +50,7 @@ function getResponse(req, res) {
       res.end(JSON.stringify(data));
     });
   }
+  const userResData = handleUserRouter(req, res);
   if (userResData) {
     return userResData.then(data => {
       res.end(JSON.stringify(data));

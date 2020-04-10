@@ -8,7 +8,8 @@ const responseWrapper = promise => {
   return promise.then(data => {
     return new SuccessModel(data, 'success');
   }).catch(err => {
-    return new ErrorModel(null, `fail ${err.message}`);
+    const msg = typeof err === 'string' ? err : err.message;
+    return new ErrorModel(null, `fail: ${msg}`);
   });
 }
 

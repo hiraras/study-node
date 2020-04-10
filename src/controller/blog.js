@@ -37,30 +37,34 @@ const newBlog = (data = {}) => {
   });
 }
 
-const updateBlog = id => {
-  if (!id) {
-    throw new Error('lose id');
-  }
-  return {
-    id,
-    title: '标题' + id,
-    content: '内容' + id,
-    createTime: Date.now(),
-    author: '张三',
-  }
+const updateBlog = (id, data) => {
+  let sql = `
+    update blogs set title='${data.title || ''}', content='${data.content || ''}' where id=${id || ''};
+  `;
+  return exec(sql).then(updateResult => {
+    if (updateResult.affectedRows > 0) {
+      return Promise.resolve({ id });
+    } else {
+      return Promise.reject('fail to add new blog');
+    }
+  }).catch(err => {
+    return Promise.reject(err);
+  });
 }
 
 const deleteBlog = id => {
-  if (!id) {
-    throw new Error('lose id');
-  }
-  return {
-    id,
-    title: '标题' + id,
-    content: '内容' + id,
-    createTime: Date.now(),
-    author: '张三',
-  }
+  let sql = `
+    delete from blogs where id=${id || ''};
+  `;
+  return exec(sql).then(delResult => {
+    if (delResult.affectedRows > 0) {
+      return Promise.resolve({ id });
+    } else {
+      return Promise.reject('fail to delete the blog');
+    }
+  }).catch(err => {
+    return Promise.reject(err);
+  });
 }
 
 module.exports = {
