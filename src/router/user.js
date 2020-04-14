@@ -26,7 +26,7 @@ const handleUserRouter = (req, res) => {
   if (method === CONSTANT.METHODS.GET && path === '/api/user/login-test') {
     if (req.session.username) {
       return responseWrapper(Promise.resolve({
-        username: req.cookie.username,
+        username: req.session.username,
         realname: req.session.realname
       }));
     } else {
