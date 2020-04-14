@@ -1,11 +1,10 @@
 
 const CONSTANT = require('../../config/constant');
 const { getList, getDetail, newBlog, updateBlog, deleteBlog } = require('../controller/blog');
-const { SuccessModel, ErrorModel } = require('../model/resModel');
 const { responseWrapper } = require('../../common/utils');
 
-const handleBlogRouter = (req, res) => {
-  const { method, url } = req;
+const handleBlogRouter = (req) => {
+  const { method } = req;
   const path = req.path;
   const delRequestReg = /(?<=del\/)\d+$/g;
 

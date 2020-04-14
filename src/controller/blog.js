@@ -15,7 +15,7 @@ const getList = (author, keyword) => {
 }
 
 const getDetail = (id) => {
-  const  sql = `select * from blogs where id=${id}`;
+  const sql = `select * from blogs where id=${id}`;
   return exec(sql);
 }
 
