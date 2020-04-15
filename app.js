@@ -1,35 +1,95 @@
-const http = require('http');
+
 const querystring = require('querystring');
-const CONSTANT = require('./config/constant');
+const { handleBlogRouter } = require('./src/router/blog');
+const { handleUserRouter } = require('./src/router/user');
+const { METHODS } = require('./config/constant');
 
-const server = http.createServer((req, res) => {
+const SESSION_DATA = {};
+
+const serverHandle = (req, res) => {
   const { url, method } = req;
-  const path = querystring.parse(url.split('?')[0]);
-  const query = querystring.parse(url.split('?')[1]);
+  const cookieStr = req.headers.cookie || '';
+  req.cookie = {};
+  cookieStr && cookieStr.split(';').map(item => {
+    const [key, value] = item.split('=');
+    req.cookie[key.trim()] = value.trim();
+  });
 
-  const resData = {
-    url, method, path, query
+  let userId = req.cookie.userid;
+  if (userId) {
+    if (!SESSION_DATA[userId]) {
+      SESSION_DATA[userId] = {};
+    }
+  } else {
+    userId = `${Date.now()}_${Math.floor(Math.random() * 100)}`;
+    SESSION_DATA[userId] = {};
   }
-  
+  req.session = SESSION_DATA[userId];
+  req.session.userId = userId;
+
+  // 允许跨域
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  // 浏览器发送options请求时，可能会报 Request header field content-type is not allowed by Access-Control-Allow-Headers in preflight response. 这个错误
+  // 可以通过添加下面代码解决
+  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
+  req.path = url.split('?')[0];
+  req.query = querystring.parse(url.split('?')[1]);
+  if (method === METHODS.POST) {
+    getPostBody(req).then(postData => {
+      req.body = postData;
+      getResponse(req, res);
+    }).catch(err => {
+      res.end('fail' + err.message);
+    });
+  } else if(method === METHODS.OPTIONS) {
+    res.writeHead(200, { 'Content-type': 'text/plain' });
+    res.write('404 Not Found\n');
+    res.end();
+  } else {
+    getResponse(req, res);
+  }
+}
+
+const getPostBody = (req) => {
+  return new Promise((resolve, reject) => {
+    if (req.headers['content-type'] === 'application/json') {
+      let postData = '';
+      req.on('data', thunk => {
+        postData += thunk.toString();
+      });
+      req.on('end', () => {
+        try {
+          const result = postData ? JSON.parse(postData) : {};
+          resolve(result);
+        } catch(e) {
+          reject(e);
+        }
+      });
+    } else {
+      resolve({});
+    }
+  });
+}
+
+function getResponse(req, res) {
+  const blogResData = handleBlogRouter(req, res);
   res.setHeader('Content-type', 'application/json');
-  if (method === CONSTANT.METHODS.GET) {
-    res.end(JSON.stringify(resData));
-  } else if (method === CONSTANT.METHODS.POST) {
-    let postData = '';
-    req.on('data', thunk => {
-      postData += thunk.toString();
+  if (blogResData) {
+    return blogResData.then(data => {
+      res.end(JSON.stringify(data));
     });
-    req.on('end', () => {
-      res.end(JSON.stringify({
-        ...resData,
-        postData: JSON.stringify(postData)
-      }));
+  }
+  const userResData = handleUserRouter(req, res);
+  if (userResData) {
+    return userResData.then(data => {
+      res.end(JSON.stringify(data));
     });
   }
 
+  // 未命中路由
+  res.writeHead(404, { 'Content-type': 'text/plain' });
+  res.write('<h1>404 not found</h1>');
+  res.end();
+}
 
-});
-
-server.listen(3000, () => {
-  console.log('listening on 3000 port');
-});
+module.exports = serverHandle;
