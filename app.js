@@ -4,8 +4,6 @@ const { handleBlogRouter } = require('./src/router/blog');
 const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./config/constant');
 
-const SESSION_DATA = {};
-
 const serverHandle = (req, res) => {
   const { url, method } = req;
   const cookieStr = req.headers.cookie || '';
@@ -15,16 +13,11 @@ const serverHandle = (req, res) => {
     req.cookie[key.trim()] = value.trim();
   });
 
+  req.session = {};
   let userId = req.cookie.userid;
-  if (userId) {
-    if (!SESSION_DATA[userId]) {
-      SESSION_DATA[userId] = {};
-    }
-  } else {
+  if (!userId) {
     userId = `${Date.now()}_${Math.floor(Math.random() * 100)}`;
-    SESSION_DATA[userId] = {};
   }
-  req.session = SESSION_DATA[userId];
   req.session.userId = userId;
 
   // 允许跨域
