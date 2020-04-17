@@ -52,9 +52,9 @@ const updateBlog = (id, data) => {
   });
 }
 
-const deleteBlog = id => {
+const deleteBlog = (id = '', author = '') => {
   let sql = `
-    delete from blogs where id=${id || ''};
+    delete from blogs where id=${id} and author='${author}';
   `;
   return exec(sql).then(delResult => {
     if (delResult.affectedRows > 0) {

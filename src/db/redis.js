@@ -20,7 +20,6 @@ function get(key) {
       if (err) {
         return reject(err);
       }
-      console.log(val);
       try {
         resolve(JSON.parse(val));
       } catch (err) {
