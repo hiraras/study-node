@@ -15,10 +15,10 @@ const serverHandle = (req, res) => {
   });
 
   // 允许跨域
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // res.setHeader('Access-Control-Allow-Origin', '*');
   // 浏览器发送options请求时，可能会报 Request header field content-type is not allowed by Access-Control-Allow-Headers in preflight response. 这个错误
   // 可以通过添加下面代码解决
-  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
+  // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   req.path = url.split('?')[0];
   req.query = querystring.parse(url.split('?')[1]);
   if (method === METHODS.POST) {
@@ -81,7 +81,7 @@ function getSession(req, res) {
 function getResponse(req, res) {
   const blogResData = handleBlogRouter(req, res);
   res.setHeader('Content-type', 'application/json');
-  
+
   const userResData = handleUserRouter(req, res);
   if (userResData) {
     return userResData.then(data => {
