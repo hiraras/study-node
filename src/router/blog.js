@@ -2,11 +2,16 @@
 const CONSTANT = require('../../config/constant');
 const { getList, getDetail, newBlog, updateBlog, deleteBlog } = require('../controller/blog');
 const { responseWrapper } = require('../../common/utils');
+const { get } = require('../db/redis');
 
 const handleBlogRouter = (req) => {
   const { method } = req;
   const path = req.path;
   const delRequestReg = /(?<=del\/)\d+$/g;
+
+  if (!req.session.username) {
+    return responseWrapper(Promise.reject('not login'));
+  }
 
   // 获取博客列表
   if (method === CONSTANT.METHODS.GET && path === '/api/blog/list') {
@@ -21,6 +26,7 @@ const handleBlogRouter = (req) => {
 
   // 新建一篇博客
   if (method === CONSTANT.METHODS.POST && path === '/api/blog/new') {
+    req.body.author = req.session.username;
     return responseWrapper(newBlog(req.body));
   }
 
@@ -34,7 +40,8 @@ const handleBlogRouter = (req) => {
   if (method === CONSTANT.METHODS.DELETE && path.includes('/api/blog/del')) {
     const matchRes = path.match(delRequestReg);
     const id = matchRes && matchRes[0];
-    return responseWrapper(deleteBlog(id));
+    const author = req.session.username;
+    return responseWrapper(deleteBlog(id, author));
   }
 }
 

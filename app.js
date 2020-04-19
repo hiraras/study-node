@@ -3,8 +3,7 @@ const querystring = require('querystring');
 const { handleBlogRouter } = require('./src/router/blog');
 const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./config/constant');
-
-const SESSION_DATA = {};
+const { get, set } = require('./src/db/redis');
 
 const serverHandle = (req, res) => {
   const { url, method } = req;
@@ -15,29 +14,17 @@ const serverHandle = (req, res) => {
     req.cookie[key.trim()] = value.trim();
   });
 
-  let userId = req.cookie.userid;
-  if (userId) {
-    if (!SESSION_DATA[userId]) {
-      SESSION_DATA[userId] = {};
-    }
-  } else {
-    userId = `${Date.now()}_${Math.floor(Math.random() * 100)}`;
-    SESSION_DATA[userId] = {};
-  }
-  req.session = SESSION_DATA[userId];
-  req.session.userId = userId;
-
   // 允许跨域
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // res.setHeader('Access-Control-Allow-Origin', '*');
   // 浏览器发送options请求时，可能会报 Request header field content-type is not allowed by Access-Control-Allow-Headers in preflight response. 这个错误
   // 可以通过添加下面代码解决
-  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
+  // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   req.path = url.split('?')[0];
   req.query = querystring.parse(url.split('?')[1]);
   if (method === METHODS.POST) {
     getPostBody(req).then(postData => {
       req.body = postData;
-      getResponse(req, res);
+      getSession(req, res);
     }).catch(err => {
       res.end('fail' + err.message);
     });
@@ -46,7 +33,7 @@ const serverHandle = (req, res) => {
     res.write('404 Not Found\n');
     res.end();
   } else {
-    getResponse(req, res);
+    getSession(req, res);
   }
 }
 
@@ -71,17 +58,39 @@ const getPostBody = (req) => {
   });
 }
 
+function getSession(req, res) {
+  req.session = {};
+  let userId = req.cookie.userId;
+  if (!userId) {
+    userId = `${Date.now()}_${Math.floor(Math.random() * 100)}`;
+    req.session.userId = userId;
+    getResponse(req, res);
+  } else {
+    get(userId).then(data => {
+      req.session = {
+        ...data,
+        userId
+      };
+      getResponse(req, res);
+    }).catch(err => {
+      res.end(`redis 500 ${err.message}`);
+    });
+  }
+}
+
 function getResponse(req, res) {
   const blogResData = handleBlogRouter(req, res);
   res.setHeader('Content-type', 'application/json');
-  if (blogResData) {
-    return blogResData.then(data => {
-      res.end(JSON.stringify(data));
-    });
-  }
+
   const userResData = handleUserRouter(req, res);
   if (userResData) {
     return userResData.then(data => {
+      res.end(JSON.stringify(data));
+    });
+  }
+
+  if (blogResData) {
+    return blogResData.then(data => {
       res.end(JSON.stringify(data));
     });
   }
