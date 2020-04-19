@@ -20,6 +20,7 @@ const getDetail = (id) => {
 }
 
 const newBlog = (data = {}) => {
+  console.log(data);
   let sql = `
     insert into blogs (title, content, createtime, author)
     values ('${data.title}', '${data.content}', ${Date.now()}, '${data.author}');

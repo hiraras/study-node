@@ -15,7 +15,11 @@ const handleBlogRouter = (req) => {
 
   // 获取博客列表
   if (method === CONSTANT.METHODS.GET && path === '/api/blog/list') {
-    const { author = '', keyword = '' } = req.query;
+    let { author = '' } = req.query;
+    const { keyword = '', isAdmin = false } = req.query;
+    if (isAdmin) {
+      author = req.session.username;
+    }
     return responseWrapper(getList(author, keyword));
   }
 
