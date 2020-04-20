@@ -4,6 +4,7 @@ const { handleBlogRouter } = require('./src/router/blog');
 const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./config/constant');
 const { get, set } = require('./src/db/redis');
+const { assessLog } = require('./common/utils');
 const fs = require('fs');
 const path = require('path');
 
@@ -24,10 +25,13 @@ const serverHandle = (req, res) => {
   req.path = url.split('?')[0];
   req.query = querystring.parse(url.split('?')[1]);
 
+  // 写日志
+  // assessLog({ a: 1 }); // 会自动调用toString方法转为字符串再写入日志 [object Object]
+  assessLog(`${req.method} -- ${req.url.split('?')[0]} -- ${Date.now()}`);
+
   if (req.path === '/assets/video/2-4+debugge.mp4') {
     res.writeHead(200, {'Content-Type': 'video/mp4'});  
     const filename = path.resolve(__dirname, './assets/video/2-4+debugge.mp4');
-    console.log(filename);
     var rs = fs.createReadStream(filename);  
     
     rs.pipe(res);  
