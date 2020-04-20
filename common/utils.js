@@ -3,10 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const { SuccessModel, ErrorModel } = require('../src/model/resModel');
 
-function add(a, b) {
-  return a + b;
-}
-
 function responseWrapper(promise) {
   return promise.then(data => {
     return new SuccessModel(data, 'success');
@@ -27,13 +23,13 @@ function createWriteStream(filename) {
 function writeLog(writeStream, log) {
   writeStream.write(log + '\n');
 }
+
 const assessWriteStream = createWriteStream('assess.log');
 function assessLog(log) {
   writeLog(assessWriteStream, log);
 }
 
 module.exports = {
-  add,
   responseWrapper,
   assessLog
 }
