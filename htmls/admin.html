@@ -17,6 +17,13 @@
 		#ctn {
 			margin-top: 16px;
 		}
+		#logout {
+			position: absolute;
+			right: 8px;
+			top: 8px;
+			color: blue;
+			cursor: pointer;
+		}
 
 		.item {
 			border: 1px solid black;
@@ -46,6 +53,7 @@
 
 <body>
 	<h2>Admin</h2>
+	<a id="logout">登出</a>
 	<input placeholder="根据关键词" id="keyword" />
     <button id="search">搜索</button>
     <button id="create-btn">新建</button>
@@ -68,6 +76,21 @@
     });
     $('#create-btn').on('click', function () {
 		window.location.href = '/create';
+	});
+	$('#logout').on('click', function() {
+		$.ajax({
+			async: true,
+			url: '/api/user/logout',
+			cache: false,
+			dataType: 'json', // 返回数据的数据类型
+			type: 'GET',
+			success: function (result) {
+				console.log(result);
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		});
 	});
 	function createElem(data) {
 		const $ctn = $('#ctn');

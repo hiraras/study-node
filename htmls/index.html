@@ -101,7 +101,9 @@
 			dataType: 'json', // 返回数据的数据类型
 			type: 'GET',
 			success: function (result) {
-				createElem(result.data);
+				if (Array.isArray(result.data)) {
+					createElem(result.data);
+				}
 			},
 			error: function (err) {
 				console.log(err);
