@@ -4,6 +4,8 @@ const { handleBlogRouter } = require('./src/router/blog');
 const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./config/constant');
 const { get, set } = require('./src/db/redis');
+const fs = require('fs');
+const path = require('path');
 
 const serverHandle = (req, res) => {
   const { url, method } = req;
@@ -21,6 +23,22 @@ const serverHandle = (req, res) => {
   // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   req.path = url.split('?')[0];
   req.query = querystring.parse(url.split('?')[1]);
+
+  if (req.path === '/assets/video/2-4+debugge.mp4') {
+    res.writeHead(200, {'Content-Type': 'video/mp4'});  
+    const filename = path.resolve(__dirname, './assets/video/2-4+debugge.mp4');
+    console.log(filename);
+    var rs = fs.createReadStream(filename);  
+    
+    rs.pipe(res);  
+    
+    rs.on('end',function(){  
+      res.end();  
+      console.log('end call');  
+    }); 
+    return ;
+  }
+
   if (method === METHODS.POST) {
     getPostBody(req).then(postData => {
       req.body = postData;
