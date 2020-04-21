@@ -69,7 +69,7 @@
 			$elem.attr('blog-id', elem.id)
 			const $title = $('<h3></h3>');
 			$title.addClass('title');
-			$title.text(elem.title);
+			$title.append(elem.title);
 			const $content = $('<div></div>');
 			$content.addClass('content');
 			const $user = $('<span></span>');

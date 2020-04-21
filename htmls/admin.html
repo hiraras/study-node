@@ -101,7 +101,7 @@
 			$elem.attr('blog-id', elem.id);
 			const $title = $('<p></p>');
 			$title.addClass('title');
-			$title.text(elem.title);
+			$title.append(elem.title);
 			const $time = $('<span></span>');
 			$time.addClass('time');
             $time.text(formatTime(elem.createtime));

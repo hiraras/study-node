@@ -60,7 +60,7 @@
     });
   });
   function insertData(data) {
-    $('#title').text(data.title);
+    $('#title').append(data.title);
     $('#author').text(data.author);
     $('#time').text(formatTime(data.createtime));
     $('#content').text(data.content);
