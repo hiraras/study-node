@@ -2,6 +2,8 @@
 const fs = require('fs');
 const path = require('path');
 const { SuccessModel, ErrorModel } = require('../src/model/resModel');
+const crypto = require('crypto');
+const SECRET_KEY = 'Wfjie_fjFIE5E6';
 
 function responseWrapper(promise) {
   return promise.then(data => {
@@ -29,7 +31,17 @@ function assessLog(log) {
   writeLog(assessWriteStream, log);
 }
 
+function md5(content) {
+  let md5 = crypto.createHash('md5');
+  return md5.update(content).digest('hex');
+}
+
+function genPassword(psw) {
+  return md5(`${psw}${SECRET_KEY}`);
+}
+
 module.exports = {
   responseWrapper,
-  assessLog
+  assessLog,
+  genPassword
 }
