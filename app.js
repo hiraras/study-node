@@ -28,7 +28,6 @@ const serverHandle = (req, res) => {
   // 写日志
   // assessLog({ a: 1 }); // 会自动调用toString方法转为字符串再写入日志 [object Object]
   assessLog(`${req.method} -- ${req.url.split('?')[0]} -- ${req.headers['user-agent']} -- ${Date.now()}`);
-
   if (req.path === '/assets/video/2-4+debugge.mp4') {
     res.writeHead(200, {'Content-Type': 'video/mp4'});  
     const filename = path.resolve(__dirname, './assets/video/2-4+debugge.mp4');
@@ -37,7 +36,7 @@ const serverHandle = (req, res) => {
     rs.pipe(res);  
     
     rs.on('end',function(){  
-      res.end();  
+      res.end();
       console.log('end call');  
     }); 
     return ;
