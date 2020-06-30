@@ -4,9 +4,9 @@ const { login } = require('../controller/user');
 const { responseWrapper } = require('../../common/utils');
 const { set } = require('../db/redis');
 
-const getCookieExpires = () => {
+const getCookieExpires = (time) => {
   const d = new Date();
-  d.setTime(d.getTime() + 86400000);
+  d.setTime(d.getTime() + time);
   return d.toGMTString();
 }
 
@@ -22,6 +22,10 @@ const handleUserRouter = (req, res) => {
     }).catch(err => {
       return responseWrapper(Promise.reject(err));
     });
+  }
+  if (method === CONSTANT.METHODS.GET && path === '/api/user/logout') {
+    res.setHeader('Set-Cookie', `userId=${session.userId}; path=/; httpOnly; expires=${getCookieExpires(-1)}`);
+    return responseWrapper(Promise.resolve(true));
   }
 }
 

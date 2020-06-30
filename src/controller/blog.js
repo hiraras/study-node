@@ -1,5 +1,6 @@
 
 const { exec } = require('../db/mysql');
+const xss = require('xss');
 
 const getList = (author, keyword) => {
   // 1=1 适配后续内容
@@ -20,10 +21,11 @@ const getDetail = (id) => {
 }
 
 const newBlog = (data = {}) => {
-  console.log(data);
+  const title = xss(data.title);
+  const content = xss(data.content);
   let sql = `
     insert into blogs (title, content, createtime, author)
-    values ('${data.title}', '${data.content}', ${Date.now()}, '${data.author}');
+    values ('${title}', '${content}', ${Date.now()}, '${data.author}');
   `;
   return exec(sql).then(insertResult => {
     if (insertResult.affectedRows === 1) {
@@ -39,8 +41,10 @@ const newBlog = (data = {}) => {
 }
 
 const updateBlog = (id, data) => {
+  const title = xss(data.title);
+  const content = xss(data.content);
   let sql = `
-    update blogs set title='${data.title || ''}', content='${data.content || ''}' where id=${id || ''};
+    update blogs set title='${title || ''}', content='${content || ''}' where id=${id || ''};
   `;
   return exec(sql).then(updateResult => {
     if (updateResult.affectedRows > 0) {

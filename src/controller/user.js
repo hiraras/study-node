@@ -1,10 +1,14 @@
 
-const { exec } = require('../db/mysql');
+const { exec, escape } = require('../db/mysql');
+const { genPassword } = require('../../common/utils');
 
 const login = (postData = { username: '', password: '' }) => {
-  const { username, password } = postData;
+  const username = escape(postData.username);
+  // 生成加密密码
+  const password = escape(genPassword(postData.password));
+
   const sql = `
-    select username, realname from users where username='${username}' and password='${password}';
+    select username, realname from users where username=${username} and password=${password};
   `;
   return exec(sql).then(result => {
     if (result && result.length) {

@@ -27,14 +27,25 @@ function getFileContent(fileName) {
   });
 }
 
-getFileContent('a.json').then(data => {
-  console.log(data);
-  return getFileContent(data.next);
-}).then(data => {
-  console.log(data);
-  return getFileContent(data.next);
-}).then(data => {
-  console.log(data);
-}).catch(err => {
-  console.log(err);
-});
+// getFileContent('a.json').then(data => {
+//   console.log(data);
+//   return getFileContent(data.next);
+// }).then(data => {
+//   console.log(data);
+//   return getFileContent(data.next);
+// }).then(data => {
+//   console.log(data);
+// }).catch(err => {
+//   console.log(err);
+// });
+
+async function readFiles() {
+  const aData = await getFileContent('a.json');
+  console.log(aData);
+  const bData = await getFileContent('b.json');
+  console.log(bData);
+  const cData = await getFileContent('c.json');
+  console.log(cData);
+}
+
+readFiles();

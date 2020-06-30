@@ -28,7 +28,7 @@
   </div>
   <div id="content"></div>
 </body>
-<script src="./js/jquery-1.8.3.min.js"></script>
+<script src="./js/jquery-1.8.3.js"></script>
 <script type="text/javascript">
   function getQuery() {
     const str = location.search.slice(1);
@@ -60,7 +60,7 @@
     });
   });
   function insertData(data) {
-    $('#title').text(data.title);
+    $('#title').append(data.title);
     $('#author').text(data.author);
     $('#time').text(formatTime(data.createtime));
     $('#content').text(data.content);

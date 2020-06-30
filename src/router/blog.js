@@ -2,7 +2,6 @@
 const CONSTANT = require('../../config/constant');
 const { getList, getDetail, newBlog, updateBlog, deleteBlog } = require('../controller/blog');
 const { responseWrapper } = require('../../common/utils');
-const { get } = require('../db/redis');
 
 const handleBlogRouter = (req) => {
   const { method } = req;

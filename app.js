@@ -4,6 +4,9 @@ const { handleBlogRouter } = require('./src/router/blog');
 const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./config/constant');
 const { get, set } = require('./src/db/redis');
+const { assessLog } = require('./common/utils');
+const fs = require('fs');
+const path = require('path');
 
 function setCookie(req) {
   const cookieStr = req.headers.cookie || '';
@@ -29,6 +32,23 @@ const serverHandle = (req, res) => {
   // 可以通过添加下面代码解决
   // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   req.path = url.split('?')[0];
+
+  // 写日志
+  // assessLog({ a: 1 }); // 会自动调用toString方法转为字符串再写入日志 [object Object]
+  assessLog(`${req.method} -- ${req.url.split('?')[0]} -- ${req.headers['user-agent']} -- ${Date.now()}`);
+  if (req.path === '/assets/video/2-4+debugge.mp4') {
+    res.writeHead(200, {'Content-Type': 'video/mp4'});  
+    const filename = path.resolve(__dirname, './assets/video/2-4+debugge.mp4');
+    var rs = fs.createReadStream(filename);  
+    
+    rs.pipe(res);  
+    
+    rs.on('end',function(){  
+      res.end();
+      console.log('end call');  
+    }); 
+    return ;
+  }
 
   if (method === METHODS.POST) {
     getPostBody(req).then(postData => {
