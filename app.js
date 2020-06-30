@@ -5,22 +5,31 @@ const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./config/constant');
 const { get, set } = require('./src/db/redis');
 
-const serverHandle = (req, res) => {
-  const { url, method } = req;
+function setCookie(req) {
   const cookieStr = req.headers.cookie || '';
   req.cookie = {};
   cookieStr && cookieStr.split(';').map(item => {
     const [key, value] = item.split('=');
     req.cookie[key.trim()] = value.trim();
   });
+}
 
+function setQuery(req) {
+  req.query = querystring.parse(req.url.split('?')[1]);
+}
+
+const serverHandle = (req, res) => {
+  const { url, method } = req;
+
+  setCookie(req);
+  setQuery(req);
   // 允许跨域
   // res.setHeader('Access-Control-Allow-Origin', '*');
   // 浏览器发送options请求时，可能会报 Request header field content-type is not allowed by Access-Control-Allow-Headers in preflight response. 这个错误
   // 可以通过添加下面代码解决
   // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   req.path = url.split('?')[0];
-  req.query = querystring.parse(url.split('?')[1]);
+
   if (method === METHODS.POST) {
     getPostBody(req).then(postData => {
       req.body = postData;
@@ -41,8 +50,8 @@ const getPostBody = (req) => {
   return new Promise((resolve, reject) => {
     if (req.headers['content-type'] === 'application/json') {
       let postData = '';
-      req.on('data', thunk => {
-        postData += thunk.toString();
+      req.on('data', chunk => {
+        postData += chunk.toString();
       });
       req.on('end', () => {
         try {
@@ -81,6 +90,7 @@ function getSession(req, res) {
 function getResponse(req, res) {
   const blogResData = handleBlogRouter(req, res);
   res.setHeader('Content-type', 'application/json');
+  // res.setHeader('Content-type', 'text/plain')
 
   const userResData = handleUserRouter(req, res);
   if (userResData) {

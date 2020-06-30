@@ -25,8 +25,8 @@ const newBlog = (data = {}) => {
     insert into blogs (title, content, createtime, author)
     values ('${data.title}', '${data.content}', ${Date.now()}, '${data.author}');
   `;
-  return exec(sql).then(insertData => {
-    if (insertData.affectedRows === 1) {
+  return exec(sql).then(insertResult => {
+    if (insertResult.affectedRows === 1) {
       return Promise.resolve({
         id: insertData.insertId
       });

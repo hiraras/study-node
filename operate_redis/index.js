@@ -17,3 +17,9 @@ redisClient.get('realname', (err, val) => {
   console.log(val);
   redisClient.quit();
 });
+
+// redis-cli // 进入redis命令行客户端
+// set key value // 设置
+// get key // 获取
+// keys * // 获取全部键值
+// del key // 删除
