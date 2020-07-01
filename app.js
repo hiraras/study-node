@@ -2,9 +2,9 @@
 const querystring = require('querystring');
 const { handleBlogRouter } = require('./src/router/blog');
 const { handleUserRouter } = require('./src/router/user');
-const { METHODS } = require('./config/constant');
+const { METHODS } = require('./src/conf/constant');
 const { get, set } = require('./src/db/redis');
-const { assessLog } = require('./common/utils');
+const { assessLog } = require('./src/utils/log');
 const fs = require('fs');
 const path = require('path');
 
@@ -41,7 +41,10 @@ const serverHandle = (req, res) => {
     const filename = path.resolve(__dirname, './assets/video/2-4+debugge.mp4');
     var rs = fs.createReadStream(filename);  
     
-    rs.pipe(res);  
+    rs.pipe(res);
+    rs.on('error', (error) => {
+      console.log(error)
+    })
     
     rs.on('end',function(){  
       res.end();

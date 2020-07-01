@@ -1,6 +1,6 @@
 
 const { exec, escape } = require('../db/mysql');
-const { genPassword } = require('../../common/utils');
+const { genPassword } = require('../utils/password');
 
 const login = (postData = { username: '', password: '' }) => {
   const username = escape(postData.username);

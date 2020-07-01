@@ -1,7 +1,7 @@
 
-const CONSTANT = require('../../config/constant');
+const CONSTANT = require('../conf/constant');
 const { login } = require('../controller/user');
-const { responseWrapper } = require('../../common/utils');
+const { responseWrapper } = require('../utils/response');
 const { set } = require('../db/redis');
 
 const getCookieExpires = (time) => {
