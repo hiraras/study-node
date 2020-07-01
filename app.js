@@ -5,6 +5,7 @@ const { handleUserRouter } = require('./src/router/user');
 const { METHODS } = require('./src/conf/constant');
 const { get, set } = require('./src/db/redis');
 const { assessLog } = require('./src/utils/log');
+// const { assessLog } = require('./logs/divide_logs'); // 拆分日志
 const fs = require('fs');
 const path = require('path');
 

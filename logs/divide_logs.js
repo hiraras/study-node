@@ -19,6 +19,9 @@ function copyFile(filename1, filename2) {
     const readStream = fs.createReadStream(filename1);
     const writeStream = fs.createWriteStream(filename2);
     readStream.pipe(writeStream);
+    readStream.on('error', error => {
+      console.log(error)
+    })
     readStream.on('end', () => {
       console.log('copy completed');
       clearFile(filename1);
@@ -31,23 +34,21 @@ function clearFile(filename) {
   fs.createWriteStream(filename).write('');
 }
 
+const assessLogFile = path.join(__dirname, '../', 'logs', 'assess.log');
+const assessWriteStream = createWriteStream(assessLogFile, {
+  flags: 'a'
+});
+
 function assessLog(log) {
-  const filename = `${formatDateOfDay(new Date())}.assess.log`;
-  const fullFilename = path.join(__dirname, '../', 'logs/assess-logs', filename);
-  const assessLogFile = path.join(__dirname, '../', 'logs', 'assess.log');
-  let assessWriteStream = null;
+  // 观察前一天的日志是否存在，存在则说明当前不为今日初次访问服务
+  const filename = `${formatDateOfDay(new Date(Date.now() - 86400000))}.assess.log`;
+  const fullFilename = path.join(__dirname, '/assess-logs', filename);
   fs.exists(fullFilename, function(exist) {
     if (!exist) {
       copyFile(assessLogFile, fullFilename).then(() => {
-        assessWriteStream = createWriteStream(assessLogFile, {
-          flags: 'a'
-        });
         writeLog(assessWriteStream, log);
       });
     } else {
-      assessWriteStream = createWriteStream(assessLogFile, {
-        flags: 'a'
-      });
       writeLog(assessWriteStream, log);
     }
   })

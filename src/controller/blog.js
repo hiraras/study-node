@@ -23,6 +23,7 @@ const getDetail = (id) => {
 const newBlog = (data = {}) => {
   const title = xss(data.title);
   const content = xss(data.content);
+  // const content = data.content;
   let sql = `
     insert into blogs (title, content, createtime, author)
     values ('${title}', '${content}', ${Date.now()}, '${data.author}');
@@ -30,7 +31,7 @@ const newBlog = (data = {}) => {
   return exec(sql).then(insertResult => {
     if (insertResult.affectedRows === 1) {
       return Promise.resolve({
-        id: insertData.insertId
+        id: insertResult.insertId
       });
     } else {
       return Promise.reject('fail to add new blog');
